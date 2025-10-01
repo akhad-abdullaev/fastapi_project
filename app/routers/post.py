@@ -40,7 +40,6 @@ async def update_post(post_id: str, post_data: PostUpdate):
     return post
 
 
-
 @router.delete("/posts/{post_id}")
 async def delete_post(post_id: str):
     post = await Post.get(post_id)

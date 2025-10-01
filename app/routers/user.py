@@ -13,6 +13,7 @@ from app.authentication.auth import (
 from passlib.context import CryptContext
 
 
+
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -70,7 +71,6 @@ async def create_user(user: UserCreate):
         full_name=new_user.full_name,
         disabled=new_user.disabled,
     )
-
 
 
 @router.get("/users/me", response_model=UserResponse)
