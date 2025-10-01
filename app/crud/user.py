@@ -1,31 +1,74 @@
-from sqlalchemy.orm import Session
+# from sqlalchemy.orm import Session
+# from app.schemas.user import UserCreate
+# from app.models.user import User
+# from passlib.context import CryptContext
+
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+
+# def get_user(db: Session, username: str):
+#     return db.query(User).filter(User.username == username).first()
+
+# def get_user_by_id(db: Session, user_id: int):
+#     return db.query(User).filter(User.id == user_id).first()
+
+# def create_user_in_db(db: Session, user: UserCreate):
+#     hashed_password = pwd_context.hash(user.password)
+#     db_user = User(username=user.username, full_name=user.full_name, hashed_password=hashed_password)
+#     db.add(db_user)
+#     db.commit()
+#     db.refresh(db_user)
+#     return db_user
+
+# def verify_password(plain_password, hashed_password):
+#     return pwd_context.verify(plain_password, hashed_password)
+
+# def authenticate_user(db: Session, username: str, password: str):
+#     user = get_user(db, username)
+#     if not user:
+#         return False
+#     if not verify_password(password, user.hashed_password):
+#         return False
+#     return user
+
+
+
+
+from typing import Optional
 from app.schemas.user import UserCreate
-from app.models.user import User
+from app.models.user import User  # Beanie Document
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
+async def get_user(username: str) -> Optional[User]:
+    return await User.find_one(User.username == username)
 
-def get_user(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
 
-def get_user_by_id(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
+async def get_user_by_id(user_id: str) -> Optional[User]:
+    return await User.get(user_id)
 
-def create_user_in_db(db: Session, user: UserCreate):
+
+async def create_user_in_db(user: UserCreate) -> User:
     hashed_password = pwd_context.hash(user.password)
-    db_user = User(username=user.username, full_name=user.full_name, hashed_password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    db_user = User(
+        username=user.username,
+        full_name=user.full_name,
+        hashed_password=hashed_password,
+        disabled=False,
+    )
+    await db_user.insert()
     return db_user
 
-def verify_password(plain_password, hashed_password):
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-def authenticate_user(db: Session, username: str, password: str):
-    user = get_user(db, username)
+
+async def authenticate_user(username: str, password: str) -> Optional[User]:
+    user = await get_user(username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):

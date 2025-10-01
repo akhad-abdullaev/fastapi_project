@@ -1,10 +1,9 @@
 from pydantic import BaseModel
-
-
+from typing import Optional
 
 class PostBase(BaseModel):
     name: str
-    description: str
+    description: Optional[str] = None
 
 class PostCreate(PostBase):
     pass
@@ -12,8 +11,14 @@ class PostCreate(PostBase):
 class PostUpdate(PostBase):
     pass
 
-class Post(PostBase):
-    id: int
+class PostResponse(PostBase):
+    id: str  
 
     class Config:
-        orm_mode = True
+        json_schema_extra = {
+            "example": {
+                "id": "6512bd43d9caa6e02c990b0a",
+                "name": "First Post",
+                "description": "Hello MongoDB with Beanie"
+            }
+        }

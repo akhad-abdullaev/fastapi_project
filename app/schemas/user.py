@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
-
+from beanie import PydanticObjectId
 
 
 class UserBase(BaseModel):
@@ -10,12 +10,17 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
-class User(UserBase):
-    id: int
-    disabled: Optional[bool] = None
+
+class UserResponse(BaseModel):
+    id: str
+    username: str
+    full_name: Optional[str]
+    disabled: bool
 
     class Config:
         orm_mode = True
+        json_encoders = {PydanticObjectId: str}
+
 
 class Token(BaseModel):
     access_token: str

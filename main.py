@@ -1,10 +1,13 @@
+from database import init_db
 import uvicorn
 from fastapi import FastAPI
 from app.routers import post, user
-from sqlalchemy.ext.declarative import declarative_base
-
 
 app = FastAPI()
+
+@app.on_event("startup")
+async def on_startup():
+    await init_db()
 
 
 app.include_router(post.router, prefix="/api")
